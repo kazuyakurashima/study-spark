@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: DB設計仕様は ./docs/StudySpark_DB_Spec.mdc を参照
+globs: []
+alwaysApply: true
+---
+
+このプロジェクトの全DB設計に関する定義は、  
+→ `docs/StudySpark_DB_Spec.mdc` に従うこと。
