@@ -7,6 +7,7 @@ import { GoalProvider } from "@/contexts/goal-context"
 import { ProfileProvider } from "@/contexts/profile-context"
 import { AuthProvider } from "@/contexts/auth-context"
 import { Toaster } from "@/components/ui/toaster"
+import Navbar from '@/components/ui/Navbar'
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className={inter.className}>
+        <Navbar />
         <AuthProvider>
           <ProfileProvider>
             <GoalProvider>
