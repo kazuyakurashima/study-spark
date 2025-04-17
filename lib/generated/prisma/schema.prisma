@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String   @id @default(uuid()) // ユーザー一人ひとりを区別するためのID (自動で生成)
+  email               String   @unique // メールアドレス (他の人と同じものは登録できない)
+  displayName         String   @map("display_name") // 表示名 (DBのカラム名は display_name になる)
+  // ↑ @db.VarChar(15) は、以前エラーが出たので、今はまだ書かないでおきましょう！
+  avatarPath          String?  @map("avatar_path") // アバター画像のパス (なくてもOK? なので String?)
+  onboardingCompleted Boolean  @default(false) @map("onboarding_completed") // 初期設定が終わったかどうかのフラグ (最初は false)
+  createdAt           DateTime @default(now()) @map("created_at") // データが作られた日時 (自動で記録)
+  updatedAt           DateTime @updatedAt @map("updated_at") // データが更新された日時 (自動で記録・更新)
+
+  // ↓ このモデル(User)が、データベースのどのテーブル名に対応するか指定
+  @@map("users")
+}
