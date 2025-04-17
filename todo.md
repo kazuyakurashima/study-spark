@@ -6,13 +6,12 @@
   - StudySpark_DB_Spec.mdc にてテーブル構造確定済
   - ER図：Supabase Studioにて自動生成予定（Prisma反映後）
 
-- [ ] **Prismaによる Supabase DB セットアップ**
+- [x] **Prismaによる Supabase DB セットアップ ✅ 完了**
   - [x] `.env` に `DATABASE_URL` を記述（Supabaseの接続情報）
-  - [ ] `schema.prisma` にテーブル定義を書く（まずは `users` から）
-  - [ ] `npx prisma migrate dev --name init` でマイグレーション実行（Supabase にテーブル作成）
-  - [ ] `prisma/seed.ts` にシードデータ作成（mockユーザー）
-  - [ ] `npx prisma db seed` でデータ投入（初期データ確認）
-
+  - [x] `schema.prisma` にテーブル定義を作成（設計仕様書に基づき全テーブル実装）
+  - [x] `npx prisma db push` でSupabaseにテーブル作成
+  - [x] `prisma/seed.js` にシードデータ作成（アバター、選択肢マスター、教材データ）
+  - [x] `npx prisma db seed` でデータ投入完了
 
 - [ ] **認証システムの実装（Supabase Auth）**
   - [ ] ログイン / ログアウト機能のフロントUI
