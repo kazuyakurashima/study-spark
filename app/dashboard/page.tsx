@@ -1,30 +1,29 @@
-import { createServerClient } from '@supabase/ssr';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 
 export default async function DashboardPage() {
-  const cookieStore = cookies();
-  
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
+  const supabase = createServerComponentClient({ cookies });
   
   const { data: { user } } = await supabase.auth.getUser();
+  
+  let userProfile = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    
+    userProfile = profile;
+  }
   
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">ダッシュボード</h1>
         <p className="mt-2 text-gray-600">
-          ようこそ{user?.email ? ` ${user.email}` : ''}さん！
+          ようこそ{userProfile?.display_name || user?.email ? ` ${userProfile?.display_name || user?.email}` : ''}さん！
         </p>
       </div>
       

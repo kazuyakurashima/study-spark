@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,11 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useRouter } from "next/navigation"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { saveUserName } from "@/services/profile-service"
 
 export function NameInput() {
   const [name, setName] = useState("")
   const [error, setError] = useState<string | null>(null)
-  const [isChecking, setIsChecking] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,21 +34,17 @@ export function NameInput() {
       return
     }
 
-    setIsChecking(true)
+    setIsLoading(true)
 
-    // 実際の実装ではSupabaseで重複チェックを行います
-    // ここではモックとして直接遷移させます
-    setTimeout(() => {
-      // 名前が "test" の場合は重複エラーを表示する（テスト用）
-      if (name === "test") {
-        setError("この名前は既に使われています。別の名前を入力してください")
-        setIsChecking(false)
-        return
-      }
-
+    try {
+      await saveUserName(name)
       router.push("/onboarding/complete")
-      setIsChecking(false)
-    }, 1000)
+    } catch (error) {
+      console.error("Error saving user name:", error)
+      setError("名前の保存に失敗しました。もう一度お試しください。")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -73,8 +68,8 @@ export function NameInput() {
             </Alert>
           )}
 
-          <Button type="submit" className="w-full bg-[#03a9f4] hover:bg-[#0288d1] text-white" disabled={isChecking}>
-            {isChecking ? "確認中..." : "登録する"}
+          <Button type="submit" className="w-full bg-[#03a9f4] hover:bg-[#0288d1] text-white" disabled={isLoading}>
+            {isLoading ? "保存中..." : "登録する"}
           </Button>
         </form>
       </CardContent>

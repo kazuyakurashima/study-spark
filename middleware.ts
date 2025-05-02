@@ -38,7 +38,8 @@ export async function middleware(request: NextRequest) {
   // 保護されたルートの場合はログインを要求
   if (!session && (
     request.nextUrl.pathname.startsWith('/dashboard') ||
-    request.nextUrl.pathname.startsWith('/profile')
+    request.nextUrl.pathname.startsWith('/profile') ||
+    request.nextUrl.pathname.startsWith('/onboarding')
   )) {
     const redirectUrl = new URL('/auth/login', request.url);
     return NextResponse.redirect(redirectUrl);
@@ -53,6 +54,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  if (session && request.nextUrl.pathname.startsWith('/dashboard')) {
+    const { data: userData } = await supabase
+      .from('users')
+      .select('onboarding_completed')
+      .eq('id', session.user.id)
+      .single();
+    
+    if (userData && !userData.onboarding_completed) {
+      const redirectUrl = new URL('/onboarding/avatar', request.url);
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
+
   return response;
 }
 
@@ -61,6 +75,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/profile/:path*',
-    '/auth/:path*'
+    '/auth/:path*',
+    '/onboarding/:path*'
   ],
 }; 

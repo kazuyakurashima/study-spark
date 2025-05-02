@@ -3,7 +3,7 @@
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { register, loginWithGoogle } from '@/services/auth-service';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -26,13 +26,10 @@ export default function RegisterPage() {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const result = await register(email, password);
 
-      if (error) {
-        throw error;
+      if (!result.success) {
+        throw new Error(result.message);
       }
 
       // 登録成功後、確認メールを送信した旨を伝えるページにリダイレクト
@@ -49,15 +46,14 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        throw error;
+      if (provider === 'google') {
+        const result = await loginWithGoogle();
+        
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+      } else {
+        throw new Error('Apple認証は現在サポートされていません');
       }
     } catch (err: any) {
       setError(err.message || 'ソーシャルログインに失敗しました。もう一度お試しください。');
@@ -190,4 +186,4 @@ export default function RegisterPage() {
       </div>
     </div>
   );
-} 
+}  

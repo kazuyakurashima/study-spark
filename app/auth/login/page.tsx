@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { loginWithEmail, loginWithGoogle } from '@/services/auth-service';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -18,13 +18,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
+      const result = await loginWithEmail(email, password);
+      
+      if (!result.success) {
+        throw new Error(result.message);
       }
 
       router.push('/dashboard');
@@ -40,15 +37,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        throw error;
+      if (provider === 'google') {
+        const result = await loginWithGoogle();
+        
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+      } else {
+        throw new Error('Apple認証は現在サポートされていません');
       }
     } catch (err: any) {
       setError(err.message || 'ソーシャルログインに失敗しました。もう一度お試しください。');
@@ -198,4 +194,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-} 
+}  

@@ -1,15 +1,37 @@
 "use client"
 
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { SparkIcon } from "@/components/ui/spark-icon"
+import { setOnboardingCompleted } from "@/services/profile-service"
 
 export function OnboardingCompletion() {
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+  
+  useEffect(() => {
+    const markOnboardingComplete = async () => {
+      try {
+        await setOnboardingCompleted(true)
+      } catch (error) {
+        console.error("Error marking onboarding as completed:", error)
+      }
+    }
+    
+    markOnboardingComplete()
+  }, [])
 
-  const handleContinue = () => {
-    router.push("/home")
+  const handleContinue = async () => {
+    try {
+      setIsLoading(true)
+      router.push("/dashboard")
+    } catch (error) {
+      console.error("Error navigating to dashboard:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -30,8 +52,12 @@ export function OnboardingCompletion() {
           <p>まずは目標を設定して、学習を始めましょう！</p>
         </CardContent>
         <CardFooter>
-          <Button className="w-full bg-[#03a9f4] hover:bg-[#0288d1] text-white" onClick={handleContinue}>
-            始める
+          <Button 
+            className="w-full bg-[#03a9f4] hover:bg-[#0288d1] text-white" 
+            onClick={handleContinue}
+            disabled={isLoading}
+          >
+            {isLoading ? "読み込み中..." : "始める"}
           </Button>
         </CardFooter>
       </Card>
