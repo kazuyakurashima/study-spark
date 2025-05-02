@@ -1,10 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { BottomNavigation } from "@/components/layout/bottom-navigation"
 import TalkRoom from "@/components/talk/talk-room"
+
+function TalkRoomLoading() {
+  return (
+    <div className="flex items-center justify-center h-full">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  )
+}
 
 export default function TalkRoomPage() {
   const router = useRouter()
@@ -35,7 +43,9 @@ export default function TalkRoomPage() {
   return (
     <main className="flex min-h-screen flex-col pb-20">
       <Header title={`${coachName}コーチとのトーク`} />
-      <TalkRoom />
+      <Suspense fallback={<TalkRoomLoading />}>
+        <TalkRoom />
+      </Suspense>
       <BottomNavigation />
     </main>
   )
