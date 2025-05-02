@@ -1,11 +1,43 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { register, loginWithGoogle } from '@/services/auth-service';
 
+function RegisterLoading() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <div className="flex items-center justify-center">
+            <div className="w-10 h-10 mr-3 animate-pulse bg-gray-200 rounded-full"></div>
+            <div className="h-10 w-40 animate-pulse bg-gray-200 rounded"></div>
+          </div>
+          <div className="mt-3 h-6 w-64 mx-auto animate-pulse bg-gray-200 rounded"></div>
+        </div>
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden p-8">
+          <div className="h-14 mb-6 animate-pulse bg-gray-200 rounded-lg"></div>
+          <div className="space-y-6">
+            <div className="h-10 animate-pulse bg-gray-200 rounded-lg"></div>
+            <div className="h-10 animate-pulse bg-gray-200 rounded-lg"></div>
+            <div className="h-10 animate-pulse bg-gray-200 rounded-lg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={<RegisterLoading />}>
+      <RegisterContent />
+    </Suspense>
+  );
+}
+
+function RegisterContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -186,4 +218,4 @@ export default function RegisterPage() {
       </div>
     </div>
   );
-}  
+}      

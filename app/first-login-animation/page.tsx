@@ -1,9 +1,17 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, Suspense } from "react"
 import { useRouter } from "next/navigation"
 
-export default function FirstLoginAnimationPage() {
+function AnimationLoading() {
+  return (
+    <div className="relative w-full h-full min-h-screen flex items-center justify-center overflow-hidden">
+      <div className="text-white text-xl">読み込み中...</div>
+    </div>
+  )
+}
+
+function AnimationContent() {
   const router = useRouter()
 
   useEffect(() => {
@@ -30,5 +38,13 @@ export default function FirstLoginAnimationPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function FirstLoginAnimationPage() {
+  return (
+    <Suspense fallback={<AnimationLoading />}>
+      <AnimationContent />
+    </Suspense>
   )
 }

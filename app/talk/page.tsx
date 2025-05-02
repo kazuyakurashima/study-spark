@@ -1,12 +1,20 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { BottomNavigation } from "@/components/layout/bottom-navigation"
 import { CoachSelection } from "@/components/talk/coach-selection"
 
-export default function TalkPage() {
+function TalkPageLoading() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center pb-20">
+      <p>読み込み中...</p>
+    </main>
+  )
+}
+
+function TalkPageContent() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
 
@@ -21,17 +29,23 @@ export default function TalkPage() {
   }, [router])
 
   if (loading) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-center pb-20">
-        <p>読み込み中...</p>
-      </main>
-    )
+    return <TalkPageLoading />
   }
 
   return (
-    <main className="flex min-h-screen flex-col pb-20">
+    <>
       <Header title="トークルーム" />
       <CoachSelection />
+    </>
+  )
+}
+
+export default function TalkPage() {
+  return (
+    <main className="flex min-h-screen flex-col pb-20">
+      <Suspense fallback={<TalkPageLoading />}>
+        <TalkPageContent />
+      </Suspense>
       <BottomNavigation />
     </main>
   )
