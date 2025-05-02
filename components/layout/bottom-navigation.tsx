@@ -1,9 +1,33 @@
 "use client"
 
+import { Suspense } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { Flag, Calendar, MessageCircle, Sparkles } from "lucide-react"
 
-export function BottomNavigation() {
+function NavigationLoading() {
+  return (
+    <div className="bottom-nav">
+      <div className="nav-item">
+        <div className="h-5 w-5 bg-gray-200 rounded-full animate-pulse"></div>
+        <span className="h-4 w-16 bg-gray-200 rounded animate-pulse mt-1"></span>
+      </div>
+      <div className="nav-item">
+        <div className="h-5 w-5 bg-gray-200 rounded-full animate-pulse"></div>
+        <span className="h-4 w-16 bg-gray-200 rounded animate-pulse mt-1"></span>
+      </div>
+      <div className="nav-item">
+        <div className="h-5 w-5 bg-gray-200 rounded-full animate-pulse"></div>
+        <span className="h-4 w-16 bg-gray-200 rounded animate-pulse mt-1"></span>
+      </div>
+      <div className="nav-item">
+        <div className="h-5 w-5 bg-gray-200 rounded-full animate-pulse"></div>
+        <span className="h-4 w-16 bg-gray-200 rounded animate-pulse mt-1"></span>
+      </div>
+    </div>
+  )
+}
+
+function NavigationContent() {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -30,5 +54,13 @@ export function BottomNavigation() {
         <span className={isActive("/talk") ? "text-[#00c6ff]" : "text-gray-500"}>トークルーム</span>
       </button>
     </div>
+  )
+}
+
+export function BottomNavigation() {
+  return (
+    <Suspense fallback={<NavigationLoading />}>
+      <NavigationContent />
+    </Suspense>
   )
 }
