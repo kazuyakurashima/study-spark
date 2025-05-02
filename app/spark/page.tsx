@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Header } from "@/components/layout/header"
 import { BottomNavigation } from "@/components/layout/bottom-navigation"
 import { TaskList } from "@/components/spark/task-list"
@@ -8,8 +8,30 @@ import { StudyPlanCreator } from "@/components/spark/study-plan-creator"
 import { useSearchParams } from "next/navigation"
 import { mathProblems } from "@/data/math-problems"
 
-export default function TasksPage() {
-  const [plannedTasks, setPlannedTasks] = useState([])
+function SparkPageLoading() {
+  return (
+    <div className="flex items-center justify-center h-full">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  )
+}
+
+function SparkPageContent() {
+  type Problem = {
+    id: number;
+    status: "complete" | "partial" | "incorrect" | null;
+    lastUpdated: string | null;
+  };
+
+  type Task = {
+    id: number;
+    chapter: string;
+    section: string;
+    color: string;
+    problems: Problem[];
+  };
+
+  const [plannedTasks, setPlannedTasks] = useState<Task[]>([])
   const [showPlanCreator, setShowPlanCreator] = useState(false)
   const [hasPlan, setHasPlan] = useState(false)
   const searchParams = useSearchParams()
@@ -26,7 +48,7 @@ export default function TasksPage() {
     setHasPlan(hasStudyPlan)
   }, [searchParams])
 
-  const handlePlanCreated = (tasks) => {
+  const handlePlanCreated = (tasks: Task[]) => {
     setPlannedTasks(tasks)
     setHasPlan(true)
     localStorage.setItem("has_study_plan", "true")
@@ -43,12 +65,22 @@ export default function TasksPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col pb-20">
-      <Header title="スパークリスト" />
+    <>
       {showPlanCreator && (
         <StudyPlanCreator onPlanCreated={handlePlanCreated} hasPlan={hasPlan} problemData={mathProblems} />
       )}
-      <TaskList plannedTasks={plannedTasks} onCreatePlan={handleCreatePlan} />
+      <TaskList plannedTasks={[]} onCreatePlan={handleCreatePlan} />
+    </>
+  )
+}
+
+export default function TasksPage() {
+  return (
+    <main className="flex min-h-screen flex-col pb-20">
+      <Header title="スパークリスト" />
+      <Suspense fallback={<SparkPageLoading />}>
+        <SparkPageContent />
+      </Suspense>
       <BottomNavigation />
     </main>
   )
