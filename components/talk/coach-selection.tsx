@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
@@ -59,7 +59,31 @@ const coaches = [
   },
 ]
 
-export function CoachSelection() {
+function CoachSelectionLoading() {
+  return (
+    <div className="p-4">
+      <div className="shadow-lg rounded-lg bg-white p-6">
+        <div className="space-y-4">
+          <div className="h-8 w-48 mx-auto bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-4 w-64 mx-auto bg-gray-200 rounded animate-pulse"></div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="p-3 rounded-lg border border-gray-200">
+                <div className="flex flex-col items-center">
+                  <div className="w-20 h-20 rounded-full bg-gray-200 animate-pulse mb-2"></div>
+                  <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-3 w-20 bg-gray-200 rounded animate-pulse mt-1"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CoachSelectionContent() {
   const [selectedCoach, setSelectedCoach] = useState<number | null>(null)
   const [showAnimation, setShowAnimation] = useState(true)
   const [animationComplete, setAnimationComplete] = useState(false)
@@ -77,9 +101,13 @@ export function CoachSelection() {
 
   const handleContinue = () => {
     if (selectedCoach !== null) {
-      // 実際の実装ではSupabaseに保存します
-      localStorage.setItem("selectedCoach", JSON.stringify(coaches[selectedCoach - 1]))
-      router.push("/talk/room")
+      try {
+        // 実際の実装ではSupabaseに保存します
+        localStorage.setItem("selectedCoach", JSON.stringify(coaches[selectedCoach - 1]))
+        router.push("/talk/room")
+      } catch (error) {
+        console.error("Error saving coach selection:", error)
+      }
     }
   }
 
@@ -198,5 +226,13 @@ export function CoachSelection() {
         </CardFooter>
       </Card>
     </div>
+  )
+}
+
+export function CoachSelection() {
+  return (
+    <Suspense fallback={<CoachSelectionLoading />}>
+      <CoachSelectionContent />
+    </Suspense>
   )
 }
